@@ -565,10 +565,10 @@ void IrufemiEngine::Initialize(const std::wstring& title, const int32_t& clientW
     ///ShaderをCompileする
 
     //Shaderをコンパイルする
-    Microsoft::WRL::ComPtr <IDxcBlob> vertexShaderBlob = CompileShader(L"Particle.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get(), log_->GetLogStream());
+    Microsoft::WRL::ComPtr <IDxcBlob> vertexShaderBlob = CompileShader(L"resources/shaders/Particle.VS.hlsl", L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get(), log_->GetLogStream());
     assert(vertexShaderBlob != nullptr);
 
-    Microsoft::WRL::ComPtr <IDxcBlob> pixelShaderBlob = CompileShader(L"Particle.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get(), log_->GetLogStream());
+    Microsoft::WRL::ComPtr <IDxcBlob> pixelShaderBlob = CompileShader(L"resources/shaders/Particle.PS.hlsl", L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get(), log_->GetLogStream());
     assert(pixelShaderBlob != nullptr);
 
     // コンパイルが完了したのでdxcUtils、dxcCompiler、includeHandlerを解放
