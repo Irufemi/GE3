@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="imgui">
-      <UniqueIdentifier>{aa3e12f4-f66b-4a84-a987-afa795c143cf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="math">
       <UniqueIdentifier>{d550c156-20f2-429d-9345-fa886c180b31}</UniqueIdentifier>
     </Filter>
@@ -28,35 +25,11 @@
     <Filter Include="engine">
       <UniqueIdentifier>{ea94aad2-7d6a-4408-a993-71c40fa08722}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene">
-      <UniqueIdentifier>{893fd543-4896-4611-99d6-e1898aade7b1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="3D">
-      <UniqueIdentifier>{1c90d707-2613-47d1-bd66-a7303fa8f90f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="2D">
-      <UniqueIdentifier>{81443dc7-2f7f-4d80-9041-a390755139e9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source">
       <UniqueIdentifier>{817e58db-0464-4982-82fe-53fdfc4eca24}</UniqueIdentifier>
     </Filter>
-    <Filter Include="camera">
-      <UniqueIdentifier>{b2d20bfd-f14e-4085-86ad-27fd4e530cb4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="audio">
       <UniqueIdentifier>{93a356b9-f23a-4034-ab06-edadb43a2423}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene\title">
-      <UniqueIdentifier>{8ba1e22a-fc8f-4e8d-a612-611d7405c6ef}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene\inGame">
-      <UniqueIdentifier>{62ac11a7-2011-4dff-bbbf-e314a999acb5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene\result">
-      <UniqueIdentifier>{43bce2a8-ec40-4e23-aed1-47df7fff3385}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene\charaSelect">
-      <UniqueIdentifier>{2f2417b2-0679-4a03-8354-02682a715fb6}</UniqueIdentifier>
     </Filter>
     <Filter Include="math\shape">
       <UniqueIdentifier>{db73c282-9948-4cb1-b261-ea9cfae1d8a9}</UniqueIdentifier>
@@ -64,34 +37,74 @@
     <Filter Include="function\engine">
       <UniqueIdentifier>{77f986a2-7b66-4700-af13-e47264222676}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{871453a9-63b8-416e-b3b0-7fbe9f90c9a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application">
+      <UniqueIdentifier>{8bf7000f-2a0d-47d5-91c7-7171f7dfa412}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\Scene">
+      <UniqueIdentifier>{893fd543-4896-4611-99d6-e1898aade7b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\Scene\title">
+      <UniqueIdentifier>{8ba1e22a-fc8f-4e8d-a612-611d7405c6ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\Scene\inGame">
+      <UniqueIdentifier>{62ac11a7-2011-4dff-bbbf-e314a999acb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\Scene\result">
+      <UniqueIdentifier>{43bce2a8-ec40-4e23-aed1-47df7fff3385}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\Scene\charaSelect">
+      <UniqueIdentifier>{2f2417b2-0679-4a03-8354-02682a715fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\camera">
+      <UniqueIdentifier>{b2d20bfd-f14e-4085-86ad-27fd4e530cb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals">
+      <UniqueIdentifier>{72fcf3ba-5923-464d-9124-4fd6faea6091}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\imgui">
+      <UniqueIdentifier>{aa3e12f4-f66b-4a84-a987-afa795c143cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3D">
+      <UniqueIdentifier>{1c90d707-2613-47d1-bd66-a7303fa8f90f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2D">
+      <UniqueIdentifier>{81443dc7-2f7f-4d80-9041-a390755139e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
-    <None Include="resources\shaders\Object3d.hlsli" />
-    <None Include="resources\shaders\Particle.hlsli" />
+    <None Include="resources\shaders\Object3d.hlsli">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="resources\shaders\Particle.hlsli">
+      <Filter>shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_demo.cpp">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_tables.cpp">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="manager\AudioManager.cpp">
       <Filter>manager</Filter>
@@ -133,10 +146,10 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="camera\Camera.cpp">
-      <Filter>camera</Filter>
+      <Filter>application\camera</Filter>
     </ClCompile>
     <ClCompile Include="camera\DebugCamera.cpp">
-      <Filter>camera</Filter>
+      <Filter>application\camera</Filter>
     </ClCompile>
     <ClCompile Include="3D\ParticleClass.cpp">
       <Filter>3D</Filter>
@@ -145,19 +158,19 @@
       <Filter>audio</Filter>
     </ClCompile>
     <ClCompile Include="scene\SceneManager.cpp">
-      <Filter>Scene</Filter>
+      <Filter>application\Scene</Filter>
     </ClCompile>
     <ClCompile Include="scene\TitleScene.cpp">
-      <Filter>Scene\title</Filter>
+      <Filter>application\Scene\title</Filter>
     </ClCompile>
     <ClCompile Include="scene\GameScene.cpp">
-      <Filter>Scene\inGame</Filter>
+      <Filter>application\Scene\inGame</Filter>
     </ClCompile>
     <ClCompile Include="scene\result\ResultScene.cpp">
-      <Filter>Scene\result</Filter>
+      <Filter>application\Scene\result</Filter>
     </ClCompile>
     <ClCompile Include="scene\charaSelect\CharaSelectScene.cpp">
-      <Filter>Scene\charaSelect</Filter>
+      <Filter>application\Scene\charaSelect</Filter>
     </ClCompile>
     <ClCompile Include="function\CompileShader.cpp">
       <Filter>function\engine</Filter>
@@ -219,28 +232,28 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imgui.h">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imgui_impl_win32.h">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imgui_internal.h">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imstb_rectpack.h">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imstb_textedit.h">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imstb_truetype.h">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="manager\AudioManager.h">
       <Filter>manager</Filter>
@@ -309,10 +322,10 @@
       <Filter>manager</Filter>
     </ClInclude>
     <ClInclude Include="scene\IScene.h">
-      <Filter>Scene</Filter>
+      <Filter>application\Scene</Filter>
     </ClInclude>
     <ClInclude Include="scene\SceneName.h">
-      <Filter>Scene</Filter>
+      <Filter>application\Scene</Filter>
     </ClInclude>
     <ClInclude Include="engine\IrufemiEngine.h">
       <Filter>engine</Filter>
@@ -342,10 +355,10 @@
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="camera\Camera.h">
-      <Filter>camera</Filter>
+      <Filter>application\camera</Filter>
     </ClInclude>
     <ClInclude Include="camera\DebugCamera.h">
-      <Filter>camera</Filter>
+      <Filter>application\camera</Filter>
     </ClInclude>
     <ClInclude Include="engine\D3DResourceLeakChecker.h">
       <Filter>engine</Filter>
@@ -360,19 +373,19 @@
       <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="scene\SceneManager.h">
-      <Filter>Scene</Filter>
+      <Filter>application\Scene</Filter>
     </ClInclude>
     <ClInclude Include="scene\TitleScene.h">
-      <Filter>Scene\title</Filter>
+      <Filter>application\Scene\title</Filter>
     </ClInclude>
     <ClInclude Include="scene\GameScene.h">
-      <Filter>Scene\inGame</Filter>
+      <Filter>application\Scene\inGame</Filter>
     </ClInclude>
     <ClInclude Include="scene\result\ResultScene.h">
-      <Filter>Scene\result</Filter>
+      <Filter>application\Scene\result</Filter>
     </ClInclude>
     <ClInclude Include="scene\charaSelect\CharaSelectScene.h">
-      <Filter>Scene\charaSelect</Filter>
+      <Filter>application\Scene\charaSelect</Filter>
     </ClInclude>
     <ClInclude Include="math\shape\AABB.h">
       <Filter>math\shape</Filter>
@@ -416,13 +429,21 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
-      <Filter>imgui</Filter>
+      <Filter>externals\imgui</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\shaders\Object3d.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Object3d.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Particle.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Particle.VS.hlsl" />
+    <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Object3d.VS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Particle.PS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Particle.VS.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
