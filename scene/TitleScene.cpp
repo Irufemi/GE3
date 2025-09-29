@@ -2,7 +2,7 @@
 
 #include "SceneManager.h"
 #include "SceneName.h"
-#include "../engine/IrufemiEngine.h"
+#include "IrufemiEngine.h"
 
 
 // 初期化
