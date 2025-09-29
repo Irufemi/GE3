@@ -4,7 +4,6 @@
 #include "SceneName.h"
 #include "IrufemiEngine.h"
 
-
 // 初期化
 void TitleScene::Initialize(IrufemiEngine* engine) {
     (void)engine;
