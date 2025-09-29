@@ -82,6 +82,8 @@ void GameScene::Initialize(IrufemiEngine* engine) {
 // 更新
 void GameScene::Update() {
 
+#ifdef _DEBUG
+
     ImGui::Begin("Activation");
     /*ImGui::Checkbox("Obj", &isActiveObj);
     ImGui::Checkbox("Sprite", &isActiveSprite);
@@ -101,6 +103,8 @@ void GameScene::Update() {
     }
     ImGui::Checkbox("debugMode", &debugMode);
     ImGui::End();
+
+#endif // _DEBUG
 
     if (debugMode) {
         debugCamera->Update();

@@ -5,7 +5,7 @@
 #include <array>
 #include <d3d12.h>
 
-#include "./engine/IrufemiEngine.h"
+#include "IrufemiEngine.h"
 #include "externals/imgui/imgui.h"
 #include "function/GetBackBufferIndex.h"
 #include "./scene/IScene.h"
@@ -75,7 +75,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #ifdef _DEBUG
 
-            // 　シーン選択UI（Requestで要求を出す）
+            // 　シーン選択UI（Requestで要求を出す）      
             ImGui::Begin("Scene Selector");
             int idx = static_cast<int>(g_SceneManager->GetCurrent());
             if (ImGui::Combo("Scene", &idx, kSceneLabels.data(), static_cast<int>(kSceneLabels.size()))) {
