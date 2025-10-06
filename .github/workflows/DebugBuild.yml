@@ -3,7 +3,7 @@ name: DebugBuild
 on:
   push:
     branches:
-      - master   # スライドどおり master。必要なら自分の既定ブランチ名に変更
+      - master
 
 env:
   # リポジトリのルートディレクトリを基点としたソリューションファイルのパス
