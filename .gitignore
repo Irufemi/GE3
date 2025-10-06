@@ -16,19 +16,7 @@
 # Mono auto generated filesmono_crash.*
 
 # Build results
-#[Dd]ebug/
-[Dd]ebugPublic/
-#[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-#[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+generated/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -64,7 +52,6 @@ artifacts/
 StyleCopReport.xml
 
 # Files built by Visual Studio
-*generated/
 
 # Chutzpah Test files
 _Chutzpah*
@@ -329,3 +316,4 @@ DirectXGame/imgui.ini
 
 # DirectXTex Compiled Shaders
 **/DirectXTex/Shaders/Compiled/
+/project/logs
