@@ -1,0 +1,2 @@
+F:\school\2.5\TD2\01\TD2_01\project\externals\DirectXTex\Bin\Desktop_2022_Win10\x64\Debug\DirectXTex.lib
+D:\school\2.5\TD2\01\TD2_01\project\externals\DirectXTex\Bin\Desktop_2022_Win10\x64\Debug\DirectXTex.lib

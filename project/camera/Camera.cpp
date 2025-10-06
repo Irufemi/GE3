@@ -94,3 +94,6 @@ void Camera::UpdateMatrix() {
     UpdateOrthographicMatrix();
     UpdateViewportMatrix();
 }
+
+// カメラ行列を取得する
+Matrix4x4 Camera::GetCameraMatrix() { return Math::MakeAffineMatrix(scale_, rotate_, translate_); }

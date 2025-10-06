@@ -3,15 +3,16 @@
 #include "../math/Vector2.h"
 #include "../math/Vector3.h"
 #include "../math/Matrix4x4.h"
+#include <numbers>
 
 class Camera {
 private: // メンバ変数
 
     //カメラの位置。ワールド座標。
-    Vector3 translate_ = { 0.0f,0.0f,-5.0f };
+    Vector3 translate_ = { 0.0f,23.0f,-10.0f };
 
     //カメラの回転角度
-    Vector3 rotate_ = { 0.0f,0.0f,0.0f };
+    Vector3 rotate_ = { std::numbers::pi_v<float> / 3.0f,0.0f,0.0f };
 
     //カメラの拡縮(ここはいじらない。)
     const Vector3 scale_ = { 1.0f,1.0f,1.0f };
@@ -130,6 +131,12 @@ public: // メンバ関数
     /// カメラの回転角度の取得
     /// </summary>
     Vector3 GetRotate() const { return this->rotate_; }
+
+    /// <summary>
+    /// カメラ行列を取得する
+    /// </summary>
+    /// <returns></returns>
+    Matrix4x4 GetCameraMatrix();
 
     /// <summary>
     /// ビュー行列の取得

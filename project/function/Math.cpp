@@ -835,6 +835,19 @@ namespace Math {
         return tMin <= tMax;
     }
 
+    // AABBと頂点の衝突判定
+    bool IsCollision(const AABB& aabb, const Vector3& point) {
+        
+        if ((aabb.min.x <= point.x && aabb.max.x >= point.x) && // x軸
+            (aabb.min.y <= point.y && aabb.max.y >= point.y) && // y軸
+            (aabb.min.z <= point.z && aabb.max.z >= point.z)    // z軸
+            ) {
+            return true;
+        }
+
+        return false;
+    }
+
 #pragma endregion
 
     Vector3 Perpendicular(const Vector3& vector) {

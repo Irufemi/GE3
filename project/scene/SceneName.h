@@ -5,7 +5,6 @@
 /// </summary>
 enum class SceneName {
     title = 0,
-    charaSelect,
     inGame,
     result,
 

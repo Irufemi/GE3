@@ -28,6 +28,12 @@ private:
     // カテゴリ名 → その中にあるファイル名リスト（ソート済み）
     std::map<std::string, std::vector<std::string>> categoryMap_;
 
+    // 追加: ファイナライズ済みフラグ
+    bool finalized_{ false };
+
+    // 追加: 管理対象か判定
+    bool IsManagedVoice(IXAudio2SourceVoice* voice) const;
+
 public:
     // コンストラクタ
     AudioManager() = default;

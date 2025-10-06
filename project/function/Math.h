@@ -375,6 +375,14 @@ namespace Math {
     /// <returns></returns>
     bool IsCollision(const AABB& aabb, const Line& line);
 
+    /// <summary>
+    /// AABBと頂点の衝突判定
+    /// </summary>
+    /// <param name="aabb"></param>
+    /// <param name="point"></param>
+    /// <returns></returns>
+    bool IsCollision(const AABB& aabb, const Vector3& point);
+
 #pragma endregion
     Vector3 Perpendicular(const Vector3& vector);
 

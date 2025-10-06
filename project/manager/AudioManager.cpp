@@ -14,6 +14,8 @@ AudioManager::~AudioManager() {
 }
 
 void AudioManager::Initialize() {
+    // 再初期化に備えて
+    finalized_ = false;
     // XAudio2エンジンの生成
     HRESULT hr = XAudio2Create(&pXAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
     assert(SUCCEEDED(hr));
@@ -36,6 +38,9 @@ void AudioManager::StartUp() {
 }
 
 void AudioManager::Finalize() {
+    if (finalized_) return;      // 多重 Finalize 防止
+    finalized_ = true;           // 以降の操作は無効化
+
     StopAll(); // すべてのVoiceを安全に停止＆Destroy
 
     if (pMasteringVoice_) {
@@ -47,6 +52,10 @@ void AudioManager::Finalize() {
         pXAudio2_ = nullptr;
     }
     MFShutdown();
+}
+
+bool AudioManager::IsManagedVoice(IXAudio2SourceVoice* voice) const {
+    return std::find(activeVoices_.begin(), activeVoices_.end(), voice) != activeVoices_.end();
 }
 
 void AudioManager::LoadAllSoundsFromFolder(const std::string& folderPath) {
@@ -120,6 +129,7 @@ std::vector<std::string> AudioManager::GetCategories() const {
 }
 
 IXAudio2SourceVoice* AudioManager::Play(std::shared_ptr<Sound> soundData, bool loop, float volume) {
+    if (finalized_) return nullptr;
     if (!pXAudio2_ || !soundData) {
         return nullptr;
     }
@@ -157,6 +167,14 @@ IXAudio2SourceVoice* AudioManager::Play(std::shared_ptr<Sound> soundData, bool l
 }
 
 void AudioManager::Stop(IXAudio2SourceVoice*& voice) {
+    if (!voice) return;
+
+    // 追加: Finalize 後 or 未管理の Voice は触らず呼び出し側だけクリア
+    if (finalized_ || !IsManagedVoice(voice)) {
+        voice = nullptr;
+        return;
+    }
+
     if (voice) {
         voice->Stop(0);
         voice->DestroyVoice();

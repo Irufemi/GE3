@@ -10,26 +10,55 @@ void ParticleClass::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& devic
     this->textureManager_ = textureManager;
     this->ui_ = ui;
 
-    randomEngine.seed(seedGenerator());
+    useBillbord_ = true;
+    isUpdate_ = true;
+
+    randomEngine_.seed(seedGenerator_());
 
     // InstancingようのParticleForGPUリソースを作る
-    instancingResource = CreateBufferResource(device.Get(), sizeof(ParticleForGPU) * kNumMaxInstance);
+    instancingResource_ = CreateBufferResource(device.Get(), sizeof(ParticleForGPU) * kNumMaxInstance_);
     // 書き込むためのアドレスを取得
-    instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
+    instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
 
-    numInstance = 0; // 描画すべきインスタンス数
+
+    // countが3コのemitterを作成しておく
+    emitter_.count = 3;
+    emitter_.frequency = 0.5f; // 0.5秒ごとに発生
+    emitter_.frequencyTime = 0.0f; // 発生頻度用の時刻、0で初期化
+    emitter_.transform.translate = { 0.0f,0.0f,0.0f };
+    emitter_.transform.rotate = { 0.0f,0.0f,0.0f };
+    emitter_.transform.scale = { 1.0f,1.0f,1.0f };
+
+    accelerationField_.acceleration = { 15.0f,0.0f,0.0f };
+    accelerationField_.area.min = { -1.0f,-1.0f,-1.0f };
+    accelerationField_.area.max = { 1.0f,1.0f,1.0f };
 
     // 単位行列を書きこんでおく
-    for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-        if (particles[index].lifeTime <= particles[index].currentTime) { // 生存時間を過ぎていたら更新せず描画対象にしない
-            continue;
-        }
+    particles_.clear();
+    for (uint32_t i = 0; i < kNumMaxInstance_; ++i) {
+        particles_.push_back(MakeNewParticle(randomEngine_, emitter_.transform.translate));
+    }
 
+    /// カメラの回転を適用する
+    billbordMatrix_ = Math::Multiply(backToFrontMatrix_, camera_->GetCameraMatrix());
+    billbordMatrix_.m[3][0] = 0.0f;
+    billbordMatrix_.m[3][1] = 0.0f;
+    billbordMatrix_.m[3][2] = 0.0f;
+
+    for (std::list<Particle>::iterator particleIterator = particles_.begin(); particleIterator != particles_.end(); ++particleIterator) {
         // 位置と速度を[-1,1]でランダムに初期化
-        particles[index] = MakeNewParticle(randomEngine);
-        instancingData[index].WVP = Math::MakeIdentity4x4();
-        instancingData[index].world = Math::MakeIdentity4x4();
-        instancingData[index].color = particles[index].color;
+        Matrix4x4 scaleMatrix = Math::MakeScaleMatrix(particleIterator->transform.scale);
+        Matrix4x4 translateMatrix = Math::MakeTranslateMatrix(particleIterator->transform.translate);
+        Matrix4x4 worldMatrix = Math::MakeIdentity4x4();
+        if (useBillbord_) {
+            worldMatrix = Math::Multiply(Math::Multiply(scaleMatrix, billbordMatrix_), translateMatrix);
+        } else {
+            worldMatrix = Math::MakeAffineMatrix(particleIterator->transform.scale, particleIterator->transform.rotate, particleIterator->transform.translate);
+        }
+        Matrix4x4 worldViewProjectionMatrix = Math::Multiply(worldMatrix, Math::Multiply(camera_->GetViewMatrix(), camera_->GetPerspectiveFovMatrix()));
+        instancingData_[numInstance_].world = worldMatrix;
+        instancingData_[numInstance_].WVP = worldViewProjectionMatrix;
+        instancingData_[numInstance_].color = particleIterator->color;
     }
 
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingDesc{};
@@ -38,13 +67,13 @@ void ParticleClass::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& devic
     instancingDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
     instancingDesc.Buffer.FirstElement = 0;
     instancingDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-    instancingDesc.Buffer.NumElements = kNumMaxInstance;
+    instancingDesc.Buffer.NumElements = kNumMaxInstance_;
     instancingDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
     const uint32_t descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     textureManager_->AddSRVIndex();
-    instancingSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, textureManager_->GetSRVIndex());
-    instancingSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, textureManager_->GetSRVIndex());
-    device->CreateShaderResourceView(instancingResource.Get(), &instancingDesc, instancingSrvHandleCPU);
+    instancingSrvHandleCPU_ = GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, textureManager_->GetSRVIndex());
+    instancingSrvHandleGPU_ = GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, textureManager_->GetSRVIndex());
+    device->CreateShaderResourceView(instancingResource_.Get(), &instancingDesc, instancingSrvHandleCPU_);
 
     // D3D12ResourceUtilを生成
     resource_ = std::make_unique<D3D12ResourceUtilParticle>();
@@ -129,11 +158,6 @@ void ParticleClass::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& devic
 
 void ParticleClass::Update(const char* particleName) {
 
-    // 速度を反映させる
-    for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-        particles[index].transform.translate += particles[index].velocity * kDeltatime;
-    }
-
 #ifdef _DEBUG
     std::string name = std::string("Particle: ") + particleName;
 
@@ -142,17 +166,28 @@ void ParticleClass::Update(const char* particleName) {
     //ウィンドウを作り出す
     ImGui::Begin(name.c_str());
 
+    if (ImGui::Button("Add Particle")) {
+        particles_.splice(particles_.end(), Emit(emitter_, randomEngine_));
+    }
+
+    ImGui::Checkbox("update", &isUpdate_);
+
+    ImGui::Checkbox("useBillbord", &useBillbord_);
+
+    ImGui::DragFloat3("EmitterTranslate", &emitter_.transform.translate.x, 0.01f, -100.0f, 100.0f);
+
     ui_->DebugMaterialBy3D(resource_->materialData_);
 
     ui_->DebugUvTransform(resource_->uvTransform_);
 
     if (ImGui::CollapsingHeader("InstanceTransform")) {
 
-        for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-            char buf[2];
-            buf[0] = '0' + static_cast<char>(index);
-            buf[1] = '\0';
-            ui_->TextTransform(particles[index].transform, buf);
+        uint32_t index = 0;
+
+        for (Particle& particle : particles_) {
+            char buf[16];
+            std::snprintf(buf, sizeof(buf), "%d", index++);
+            ui_->TextTransform(particle.transform, buf);
         }
     }
 
@@ -161,30 +196,87 @@ void ParticleClass::Update(const char* particleName) {
 
 #endif // _DEBUG
 
-    for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-        Matrix4x4 worldMatrix = Math::MakeAffineMatrix(particles[index].transform.scale, particles[index].transform.rotate, particles[index].transform.translate);
-        Matrix4x4 worldViewProjectionMatrix = Math::Multiply(worldMatrix, Math::Multiply(camera_->GetViewMatrix(), camera_->GetPerspectiveFovMatrix()));
-        instancingData[index].WVP = worldViewProjectionMatrix;
-        instancingData[index].world = worldMatrix;
-        instancingData[index].color = particles[index].color;
+    if (isUpdate_) {
+        emitter_.frequencyTime += kDeltatime_; // 時刻を進める
+        if (emitter_.frequency <= emitter_.frequencyTime) { // 頻度より大きいなら発生
+            particles_.splice(particles_.end(), Emit(emitter_, randomEngine_)); // 発生処理
+            emitter_.frequencyTime -= emitter_.frequency; // 余計に過ぎた時間も加味して頻度計算する
+        }
+    }
+
+    /// カメラの回転を適用する
+    billbordMatrix_ = Math::Multiply(backToFrontMatrix_, camera_->GetCameraMatrix());
+    billbordMatrix_.m[3][0] = 0.0f;
+    billbordMatrix_.m[3][1] = 0.0f;
+    billbordMatrix_.m[3][2] = 0.0f;
+
+    numInstance_ = 0; // 描画すべきインスタンス数
+
+    for (std::list<Particle>::iterator particleIterator = particles_.begin(); particleIterator != particles_.end();) {
+
+        if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) { // 生存時間を過ぎていたら更新せず描画対象にしない
+            particleIterator = particles_.erase(particleIterator); // 生存時間が過ぎたParticleはlistから消す。戻り値が次のイテレーターとなる
+            continue;
+        }
+
+        if (numInstance_ < kNumMaxInstance_) {
+
+            if (Math::IsCollision(accelerationField_.area, (*particleIterator).transform.translate)) {
+                (*particleIterator).velocity += accelerationField_.acceleration * kDeltatime_;
+            }
+
+            if (isUpdate_) {
+                particleIterator->currentTime += kDeltatime_; // 経過時間を足す
+                particleIterator->transform.translate += particleIterator->velocity * kDeltatime_;  // 速度を反映させる
+            }
+
+            float alpha = 1.0f - (particleIterator->currentTime / particleIterator->lifeTime);
+            Matrix4x4 scaleMatrix = Math::MakeScaleMatrix(particleIterator->transform.scale);
+            Matrix4x4 translateMatrix = Math::MakeTranslateMatrix(particleIterator->transform.translate);
+            Matrix4x4 worldMatrix = Math::MakeIdentity4x4();
+            if (useBillbord_) {
+                worldMatrix = Math::Multiply(Math::Multiply(scaleMatrix, billbordMatrix_), translateMatrix);
+            } else {
+                worldMatrix = Math::MakeAffineMatrix(particleIterator->transform.scale, particleIterator->transform.rotate, particleIterator->transform.translate);
+            }
+            Matrix4x4 worldViewProjectionMatrix = Math::Multiply(worldMatrix, Math::Multiply(camera_->GetViewMatrix(), camera_->GetPerspectiveFovMatrix()));
+            instancingData_[numInstance_].world = worldMatrix;
+            instancingData_[numInstance_].WVP = worldViewProjectionMatrix;
+            instancingData_[numInstance_].color = particleIterator->color;
+            instancingData_[numInstance_].color.w = alpha;
+
+            numInstance_++; // 生きているParticleの数を1つカウントする
+
+        }
+
+        ++particleIterator; // 次のイテレーターに進める
     }
 
     resource_->materialData_->uvTransform = Math::MakeAffineMatrix(resource_->uvTransform_.scale, resource_->uvTransform_.rotate, resource_->uvTransform_.translate);
 
 }
 
-Particle ParticleClass::MakeNewParticle(std::mt19937& randomEngine) {
+Particle ParticleClass::MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate) {
     std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
     std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
     std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
     Particle particle;
     particle.transform.scale = { 1.0f,1.0f,1.0f };
     particle.transform.rotate = { 0.0f,0.0f,0.0f };
-    particle.transform.translate = { distribution(randomEngine),distribution(randomEngine) ,distribution(randomEngine) };
+    Vector3 randomTranslate = { distribution(randomEngine),distribution(randomEngine) ,distribution(randomEngine) };
+    particle.transform.translate = translate + randomTranslate;
     particle.velocity = { distribution(randomEngine),distribution(randomEngine),distribution(randomEngine) };
     particle.color = { distColor(randomEngine),distColor(randomEngine),distColor(randomEngine) ,1.0f };
     particle.lifeTime = distTime(randomEngine);
     particle.currentTime = 0.0f;
 
     return particle;
+}
+
+std::list<Particle> ParticleClass::Emit(const Emitter& emitter, std::mt19937& randomEngine) {
+    std::list<Particle> particles;
+    for (uint32_t count = 0; count < emitter.count; ++count) {
+        particles.push_back(MakeNewParticle(randomEngine, emitter.transform.translate));
+    }
+    return particles;
 }

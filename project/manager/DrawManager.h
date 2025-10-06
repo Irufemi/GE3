@@ -26,7 +26,6 @@ private:
     ID3D12CommandAllocator* commandAllocator_ = nullptr;
     ID3D12DescriptorHeap* srvDescriptorHeap_ = nullptr;
     ID3D12RootSignature* rootSignature_ = nullptr;
-    ID3D12PipelineState* graphicsPipelineState_ = nullptr;
 
 public: //メンバ関数
     void Initialize(
@@ -37,11 +36,13 @@ public: //メンバ関数
         HANDLE &fenceEvent,
         ID3D12CommandAllocator* commandAllocator,
         ID3D12DescriptorHeap* srvDescriptorHeap,
-        ID3D12RootSignature* rootSignature,
-        ID3D12PipelineState* pipelineState
+        ID3D12RootSignature* rootSignature
     );
 
     void Finalize();
+
+    // 追加（保持はしないで即時バインド）
+    void BindPSO(ID3D12PipelineState* pso);
 
     void PreDraw(
         ID3D12Resource* backBufferResource,

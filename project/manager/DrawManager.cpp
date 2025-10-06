@@ -17,11 +17,10 @@ void DrawManager::Initialize(
     ID3D12CommandQueue* commandQueue,
     IDXGISwapChain4* swapChain,
     ID3D12Fence* fence,
-    HANDLE &fenceEvent,
+    HANDLE& fenceEvent,
     ID3D12CommandAllocator* commandAllocator,
     ID3D12DescriptorHeap* srvDescriptorHeap,
-    ID3D12RootSignature* rootSignature,
-    ID3D12PipelineState* pipelineState
+    ID3D12RootSignature* rootSignature
 ) {
     commandList_ = commandList;
     commandQueue_ = commandQueue;
@@ -31,7 +30,6 @@ void DrawManager::Initialize(
     commandAllocator_ = commandAllocator;
     srvDescriptorHeap_ = srvDescriptorHeap;
     rootSignature_ = rootSignature;
-    graphicsPipelineState_ = pipelineState;
 }
 
 void DrawManager::Finalize() {
@@ -43,7 +41,11 @@ void DrawManager::Finalize() {
     if (commandAllocator_) { commandAllocator_ = nullptr; }
     if (srvDescriptorHeap_) { srvDescriptorHeap_ = nullptr; }
     if (rootSignature_) { rootSignature_ = nullptr; }
-    if (graphicsPipelineState_) { graphicsPipelineState_ = nullptr; }
+}
+
+void DrawManager::BindPSO(ID3D12PipelineState* pso) {
+    if (!pso) { return; }
+    commandList_->SetPipelineState(pso);
 }
 
 void DrawManager::PreDraw(
@@ -99,7 +101,7 @@ void DrawManager::PreDraw(
     ///ImGuiを描画する
 
     //描画用のDescriptorHeapの設定
-    ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_};
+    ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_ };
     commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
@@ -140,7 +142,7 @@ void DrawManager::PostDraw(
     ///コマンドをキックする
 
     //GPUにコマンドリストの実行を行わせる
-    ID3D12CommandList* commandLists[] = { commandList_};
+    ID3D12CommandList* commandLists[] = { commandList_ };
     commandQueue_->ExecuteCommandLists(1, commandLists);
     //GPUとOSに画面の交換を行うよう通知する
     swapChain_->Present(1, 0);
@@ -180,7 +182,7 @@ void DrawManager::PostDraw(
 void DrawManager::DrawTriangle(
     D3D12_VIEWPORT& viewport,
     D3D12_RECT& scissorRect,
-    D3D12_VERTEX_BUFFER_VIEW &vertexBufferView,
+    D3D12_VERTEX_BUFFER_VIEW& vertexBufferView,
     ID3D12Resource* materialResource,
     ID3D12Resource* wvpResource,
     ID3D12Resource* directionalLightResource,
@@ -192,7 +194,6 @@ void DrawManager::DrawTriangle(
     commandList_->RSSetScissorRects(1, &scissorRect); //Scirssorを設定
     //RootSignatureを設定。PSOに設定しているけど別途指定が必要
     commandList_->SetGraphicsRootSignature(rootSignature_);
-    commandList_->SetPipelineState(graphicsPipelineState_); // PSOを設定
     commandList_->IASetVertexBuffers(0, 1, &vertexBufferView); // VBVを設定
     //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
     commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -242,7 +243,6 @@ void DrawManager::DrawSprite(
 
     //RootSignatureを設定。PSOに設定しているけど別途指定が必要
     commandList_->SetGraphicsRootSignature(rootSignature_);
-    commandList_->SetPipelineState(graphicsPipelineState_); // PSOを設定
 
     // 3. バッファ設定（VBV、IBV、Topology）
 
@@ -284,7 +284,7 @@ void DrawManager::DrawSprite(
 void DrawManager::DrawSphere(
     D3D12_VIEWPORT& viewport,
     D3D12_RECT& scissorRect,
-    SphereClass *sphere
+    SphereClass* sphere
 ) {
 
     /*三角形を表示しよう*/
@@ -292,7 +292,6 @@ void DrawManager::DrawSphere(
     commandList_->RSSetScissorRects(1, &scissorRect); //Scirssorを設定
     //RootSignatureを設定。PSOに設定しているけど別途指定が必要
     commandList_->SetGraphicsRootSignature(rootSignature_);
-    commandList_->SetPipelineState(graphicsPipelineState_); // PSOを設定
     commandList_->IASetVertexBuffers(0, 1, &sphere->GetD3D12Resource()->vertexBufferView_); // VBVを設定
     //IBVを設定
     commandList_->IASetIndexBuffer(&sphere->GetD3D12Resource()->indexBufferView_);
@@ -338,7 +337,6 @@ void DrawManager::DrawParticle(
     commandList_->RSSetScissorRects(1, &scissorRect); //Scirssorを設定
     //RootSignatureを設定。PSOに設定しているけど別途指定が必要
     commandList_->SetGraphicsRootSignature(rootSignature_);
-    commandList_->SetPipelineState(graphicsPipelineState_); // PSOを設定
     commandList_->IASetVertexBuffers(0, 1, &resource->GetD3D12Resource()->vertexBufferView_); // VBVを設定
     //IBVを設定
     commandList_->IASetIndexBuffer(&resource->GetD3D12Resource()->indexBufferView_);
@@ -352,7 +350,9 @@ void DrawManager::DrawParticle(
     //マテリアルCBufferの場所を設定(ここでの第一引数の0はRootParameter配列の0番目であり、registerの0ではない)
     commandList_->SetGraphicsRootConstantBufferView(0, resource->GetD3D12Resource()->materialResource_->GetGPUVirtualAddress());
 
-    commandList_->SetGraphicsRootDescriptorTable(1, resource->GetInstancingSrvHandleGPU());
+    auto instancing = resource->GetInstancingSrvHandleGPU();
+    assert(instancing.ptr != 0 && "Instancing SRV handle is null or invalid");
+    commandList_->SetGraphicsRootDescriptorTable(4, resource->GetInstancingSrvHandleGPU());
 
     /*テクスチャを貼ろう*/
 
@@ -379,7 +379,6 @@ void DrawManager::DrawByIndex(
     commandList_->RSSetScissorRects(1, &scissorRect); //Scirssorを設定
     //RootSignatureを設定。PSOに設定しているけど別途指定が必要
     commandList_->SetGraphicsRootSignature(rootSignature_);
-    commandList_->SetPipelineState(graphicsPipelineState_); // PSOを設定
     commandList_->IASetVertexBuffers(0, 1, &resource->vertexBufferView_); // VBVを設定
     //IBVを設定
     commandList_->IASetIndexBuffer(&resource->indexBufferView_);
@@ -425,7 +424,6 @@ void DrawManager::DrawByVertex(
     commandList_->RSSetScissorRects(1, &scissorRect); //Scirssorを設定
     //RootSignatureを設定。PSOに設定しているけど別途指定が必要
     commandList_->SetGraphicsRootSignature(rootSignature_);
-    commandList_->SetPipelineState(graphicsPipelineState_); // PSOを設定
     commandList_->IASetVertexBuffers(0, 1, &resource->vertexBufferView_); // VBVを設定
     //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
     commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
