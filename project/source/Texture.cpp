@@ -22,6 +22,11 @@ void Texture::Initialize(const std::string& filePath, const Microsoft::WRL::ComP
     //textureを読んで転送する
     DirectX::ScratchImage mipImages = LoadTexture(filePath_);
     const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+
+    // メタデータから元サイズを保持
+    width_ = static_cast<uint32_t>(metadata.width);
+    height_ = static_cast<uint32_t>(metadata.height);
+
     textureResource_ = CreateTextureResource(device_.Get(), metadata);
     //UploadTextureData(textureResource, mipImages);
 
@@ -41,6 +46,7 @@ void Texture::Initialize(const std::string& filePath, const Microsoft::WRL::ComP
     srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
     const uint32_t descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    (void)descriptorSizeSRV; // 未使用警告抑制
     const uint32_t descriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     const uint32_t descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 

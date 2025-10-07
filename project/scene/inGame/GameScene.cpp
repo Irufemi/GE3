@@ -15,10 +15,10 @@ void GameScene::Initialize(IrufemiEngine* engine) {
     this->engine_ = engine;
 
     camera = std::make_unique <Camera>();
-    camera->Initialize(engine_->GetClientWidth(), engine->GetClientHeight());
+    camera->Initialize(engine_->GetClientWidth(), engine_->GetClientHeight());
 
     debugCamera = std::make_unique <DebugCamera>();
-    debugCamera->Initialize(engine_->GetInputManager());
+    debugCamera->Initialize(engine_->GetInputManager(), engine_->GetClientWidth(), engine_->GetClientHeight());
     debugMode = false;
 
     isActiveObj = false;
@@ -30,6 +30,7 @@ void GameScene::Initialize(IrufemiEngine* engine) {
     isActiveMultiMesh = false;
     isActiveMultiMaterial = false;
     isActiveSuzanne = false;
+    isActiveFence_ = false;
     isActiveParticle = true;
 
 
@@ -69,6 +70,11 @@ void GameScene::Initialize(IrufemiEngine* engine) {
         suzanne = std::make_unique <ObjClass>();
         suzanne->Initialize(engine_->GetDevice(), camera.get(), engine_->GetSrvDescriptorHeap(), engine->GetCommandList(), engine_->GetDebugUI(), engine_->GetTextureManager(), "suzanne.obj");
     }
+
+    if (isActiveFence_) {
+        fence_ = std::make_unique <ObjClass>();
+        fence_->Initialize(engine_->GetDevice(), camera.get(), engine_->GetSrvDescriptorHeap(), engine->GetCommandList(), engine_->GetDebugUI(), engine_->GetTextureManager(), "fence.obj");
+    }
     if (isActiveParticle) {
         particle = std::make_unique <ParticleClass>();
         particle->Initialize(engine_->GetDevice(), engine_->GetSrvDescriptorHeap(),camera.get(),engine_->GetTextureManager(),engine_->GetDebugUI(),"circle.png");
@@ -92,6 +98,7 @@ void GameScene::Update() {
     ImGui::Checkbox("MultiMesh", &isActiveMultiMesh);
     ImGui::Checkbox("MultiMaterial", &isActiveMultiMaterial);
     ImGui::Checkbox("Suzanne", &isActiveSuzanne);
+    ImGui::Checkbox("Fence", &isActiveFence_);
     ImGui::Checkbox("Particle", &isActiveParticle);
     ImGui::End();
 
@@ -172,6 +179,13 @@ void GameScene::Update() {
         }
         suzanne->Update("Suzanne");
     }
+    if (isActiveFence_) {
+        if (!fence_) {
+            fence_ = std::make_unique<ObjClass>();
+            fence_->Initialize(engine_->GetDevice(), camera.get(), engine_->GetSrvDescriptorHeap(), engine_->GetCommandList(), engine_->GetDebugUI(), engine_->GetTextureManager(), "fence.obj");
+        }
+        fence_->Update("Fence");
+    }
     if (isActiveParticle) {
         if(!particle){
             particle = std::make_unique <ParticleClass>();
@@ -193,7 +207,7 @@ void GameScene::Update() {
    
 
     //エンターキーが押されていたら
-    if (engine_->GetInputManager()->IsKeyPressed(VK_RETURN)) {
+    if (PressedVK(VK_RETURN)) {
         if (g_SceneManager) {
             g_SceneManager->Request(SceneName::result);
         }
@@ -233,6 +247,9 @@ void GameScene::Draw() {
     }
     if (isActiveSuzanne) {
         suzanne->Draw(engine_->GetDrawManager(), engine_->GetViewport(), engine_->GetScissorRect());
+    }
+    if (isActiveFence_) {
+        fence_->Draw(engine_->GetDrawManager(), engine_->GetViewport(), engine_->GetScissorRect());
     }
     
     engine_->SetBlend(BlendMode::kBlendModeAdd);

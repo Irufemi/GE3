@@ -34,14 +34,7 @@ public:
         return true;
     }
 
-    void Update() {
-        if (pending_ != SceneName::CountOfSceneName) {
-            ChangeTo(pending_);
-            pending_ = SceneName::CountOfSceneName;
-        }
-        if (current_)
-            current_->Update();
-    }
+    void Update();
 
     void Draw() {
         if (current_)

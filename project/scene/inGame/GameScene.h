@@ -60,6 +60,9 @@ private: // メンバ変数
     std::unique_ptr<ObjClass> suzanne = nullptr;
     bool isActiveSuzanne = false;
 
+    std::unique_ptr<ObjClass> fence_ = nullptr;
+    bool isActiveFence_ = false;
+
     std::unique_ptr<ParticleClass> particle = nullptr;
     bool isActiveParticle = false;
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "D3DResourceLeakChecker.h"
-#include "../manager/InputManager.h"
+#include "../engine/Input/InputManager.h"
 #include "../manager/DrawManager.h"
 #include "../manager/DebugUI.h"
 #include "../manager/TextureManager.h"

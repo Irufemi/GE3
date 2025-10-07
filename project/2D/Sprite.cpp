@@ -13,14 +13,15 @@ void Sprite::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, Came
 
     resource_ = std::make_unique<D3D12ResourceUtil>();
 
-    //左下
-    resource_->vertexDataList_.push_back({ { 0.0f,360.0f,0.0f,1.0f }, { 0.0f,1.0f } });
-    //左上
-    resource_->vertexDataList_.push_back({ { 0.0f,0.0f,0.0f,1.0f  }, { 0.0f,0.0f} });
-    //右下
-    resource_->vertexDataList_.push_back({ { 640.0f,360.0f,0.0f,1.0f }, { 1.0f,1.0f } });
-    //右上
-    resource_->vertexDataList_.push_back({ { 640.0f,0.0f,0.0f,1.0f }, { 1.0f,0.0f } });
+    // 頂点はユニットクワッド(0..1)に統一（サイズはscaleで与える）
+    // 左下
+    resource_->vertexDataList_.push_back({ { 0.0f,1.0f,0.0f,1.0f }, { 0.0f,1.0f } });
+    // 左上
+    resource_->vertexDataList_.push_back({ { 0.0f,0.0f,0.0f,1.0f }, { 0.0f,0.0f} });
+    // 右下
+    resource_->vertexDataList_.push_back({ { 1.0f,1.0f,0.0f,1.0f }, { 1.0f,1.0f } });
+    // 右上
+    resource_->vertexDataList_.push_back({ { 1.0f,0.0f,0.0f,1.0f }, { 1.0f,0.0f } });
 
     for (uint32_t i = 0; i < static_cast<uint32_t>(resource_->vertexDataList_.size()); ++i) {
         resource_->vertexDataList_[i].normal.x = resource_->vertexDataList_[i].position.x;
@@ -76,11 +77,18 @@ void Sprite::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, Came
     resource_->materialData_->lightingMode = 2;
     resource_->materialData_->uvTransform = Math::MakeIdentity4x4();
 
+    // 初期サイズをscaleに反映（既定値）
+    resource_->transform_.scale = { size_.x, size_.y, 1.0f };
+
     //wvp
 
-    resource_->transformationMatrix_.world = Math::MakeAffineMatrix(resource_->transform_.scale, resource_->transform_.rotate, resource_->transform_.translate);
+    Vector3 pos = resource_->transform_.translate;
+    pos.x -= anchor_.x * size_.x;
+    pos.y -= anchor_.y * size_.y;
 
-    resource_->transformationMatrix_.WVP = Math::Multiply(resource_->transformationMatrix_.world, Math::Multiply(camera_->GetViewMatrix(), camera_->GetOrthographicMatrix()));
+    resource_->transformationMatrix_.world = Math::MakeAffineMatrix(resource_->transform_.scale, resource_->transform_.rotate, pos);
+
+    resource_->transformationMatrix_.WVP = Math::Multiply(resource_->transformationMatrix_.world, camera_->GetOrthographicMatrix());
 
     *resource_->transformationData_ = { resource_->transformationMatrix_.WVP,resource_->transformationMatrix_.world };
 
@@ -93,6 +101,19 @@ void Sprite::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, Came
     if (!textureNames.empty()) {
 
         resource_->textureHandle_ = textureManager_->GetTextureHandle(textureName);
+
+        // 初期サイズ: テクスチャ元サイズに合わせる（取得できない場合は既定サイズのまま）
+        uint32_t texW = 0, texH = 0;
+        if (textureManager_->GetTextureSize(textureName, texW, texH) && texW > 0 && texH > 0) {
+            SetSize(static_cast<float>(texW), static_cast<float>(texH));
+            // サイズ変更後にWVPを再計算（アンカーも再適用）
+            Vector3 pos2 = resource_->transform_.translate;
+            pos2.x -= anchor_.x * size_.x;
+            pos2.y -= anchor_.y * size_.y;
+            resource_->transformationMatrix_.world = Math::MakeAffineMatrix(resource_->transform_.scale, resource_->transform_.rotate, pos2);
+            resource_->transformationMatrix_.WVP = Math::Multiply(resource_->transformationMatrix_.world, camera_->GetOrthographicMatrix());
+            *resource_->transformationData_ = { resource_->transformationMatrix_.WVP,resource_->transformationMatrix_.world };
+        }
 
         // コンボボックス用に selectedIndex を初期化
         auto it = std::find(textureNames.begin(), textureNames.end(), textureName);
@@ -128,9 +149,14 @@ void Sprite::Update() {
 
 #endif // _DEBUG
 
-    resource_->transformationMatrix_.world = Math::MakeAffineMatrix(resource_->transform_.scale, resource_->transform_.rotate, resource_->transform_.translate);
 
-    resource_->transformationMatrix_.WVP = Math::Multiply(resource_->transformationMatrix_.world, Math::Multiply(camera_->GetViewMatrix(), camera_->GetOrthographicMatrix()));
+    Vector3 pos = resource_->transform_.translate;
+    pos.x -= anchor_.x * size_.x;
+    pos.y -= anchor_.y * size_.y;
+
+    resource_->transformationMatrix_.world = Math::MakeAffineMatrix(resource_->transform_.scale, resource_->transform_.rotate, pos);
+
+    resource_->transformationMatrix_.WVP = Math::Multiply(resource_->transformationMatrix_.world, camera_->GetOrthographicMatrix());
 
     *resource_->transformationData_ = { resource_->transformationMatrix_.WVP,resource_->transformationMatrix_.world };
 
@@ -138,4 +164,27 @@ void Sprite::Update() {
 
     resource_->directionalLightData_->direction = Math::Normalize(resource_->directionalLightData_->direction);
 
+}
+
+void Sprite::SetSize(float width, float height) {
+    size_.x = width;
+    size_.y = height;
+    // 実サイズはscaleで表現
+    resource_->transform_.scale = { size_.x, size_.y, 1.0f };
+}
+
+void Sprite::SetAnchor(float ax, float ay) {
+    anchor_.x = ax;
+    anchor_.y = ay;
+}
+
+void Sprite::SetPosition(float x, float y, float z) {
+    resource_->transform_.translate.x = x;
+    resource_->transform_.translate.y = y;
+    resource_->transform_.translate.z = z;
+    // 毎フレーム Update() で WVP を再計算しているため、ここでの再計算は不要
+}
+
+Vector2 Sprite::GetPosition2D() const {
+    return { resource_->transform_.translate.x, resource_->transform_.translate.y };
 }
