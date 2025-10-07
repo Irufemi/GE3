@@ -189,3 +189,14 @@ uint32_t TextureManager::GetSRVIndex()const {
 void TextureManager::AddSRVIndex() {
     Texture::AddStaticSRVIndex();
 }
+
+// テクスチャ名から元サイズを取得
+bool TextureManager::GetTextureSize(const std::string& name, uint32_t& outWidth, uint32_t& outHeight) const {
+    auto it = textures_.find(name);
+    if (it == textures_.end() || !it->second) {
+        return false;
+    }
+    outWidth = it->second->GetWidth();
+    outHeight = it->second->GetHeight();
+    return true;
+}

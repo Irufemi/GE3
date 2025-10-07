@@ -1,8 +1,8 @@
 #include "DebugCamera.h"
 
-void DebugCamera::Initialize(InputManager* input) {
+void DebugCamera::Initialize(InputManager* input, int windowWidth, int windowHeight) {
     input_ = input;
-    camera_.Initialize();
+    camera_.Initialize(windowWidth, windowHeight);
 }
 
 void DebugCamera::Update() {

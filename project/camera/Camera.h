@@ -189,5 +189,9 @@ public: // メンバ関数
     /// </summary>
     void UpdateMatrix();
 
+    // 2Dで使うための現在のビューポートサイズ取得
+    float GetViewportWidth() const { return width_; }
+    float GetViewportHeight() const { return height_; }
+
 };
 

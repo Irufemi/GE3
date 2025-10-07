@@ -192,6 +192,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="function\SoundUnload.cpp" />
     <ClCompile Include="function\UploadTextureData.cpp" />
     <ClCompile Include="function\WindowProc.cpp" />
+    <ClCompile Include="engine\Input\GamePad.cpp" />
+    <ClCompile Include="engine\Input\Keyboard.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -199,11 +201,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="manager\AudioManager.cpp" />
     <ClCompile Include="manager\DebugUI.cpp" />
     <ClCompile Include="manager\DrawManager.cpp" />
-    <ClCompile Include="manager\InputManager.cpp" />
+    <ClCompile Include="engine\Input\InputManager.cpp" />
     <ClCompile Include="manager\TextureManager.cpp" />
     <ClCompile Include="math\Vector3 .cpp" />
     <ClCompile Include="engine\PSOManager.cpp" />
     <ClCompile Include="scene\inGame\GameScene.cpp" />
+    <ClCompile Include="scene\IScene.cpp" />
     <ClCompile Include="scene\result\ResultScene.cpp" />
     <ClCompile Include="scene\SceneManager.cpp" />
     <ClCompile Include="scene\title\TitleScene.cpp" />
@@ -235,10 +238,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="function\Function.h" />
     <ClInclude Include="function\GetBackBufferIndex.h" />
     <ClInclude Include="function\Math.h" />
+    <ClInclude Include="engine\Input\GamePad.h" />
+    <ClInclude Include="engine\Input\Keyboard.h" />
     <ClInclude Include="manager\AudioManager.h" />
     <ClInclude Include="manager\DebugUI.h" />
     <ClInclude Include="manager\DrawManager.h" />
-    <ClInclude Include="manager\InputManager.h" />
+    <ClInclude Include="engine\Input\InputManager.h" />
     <ClInclude Include="manager\TextureManager.h" />
     <ClInclude Include="manager\VoiceCallback.h" />
     <ClInclude Include="math\AccelerationField.h" />

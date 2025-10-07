@@ -41,4 +41,7 @@ public:
 
     uint32_t GetSRVIndex()const;
     void AddSRVIndex();
+
+    // テクスチャ名から元サイズを取得（成功時 true）
+    bool GetTextureSize(const std::string& name, uint32_t& outWidth, uint32_t& outHeight) const;
 };

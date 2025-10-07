@@ -73,6 +73,9 @@
     <Filter Include="Application\Scene\result">
       <UniqueIdentifier>{43bce2a8-ec40-4e23-aed1-47df7fff3385}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Input">
+      <UniqueIdentifier>{95621e64-dbc5-4cf8-b02e-7026fe8561c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -113,9 +116,6 @@
       <Filter>Engine\manager</Filter>
     </ClCompile>
     <ClCompile Include="manager\DrawManager.cpp">
-      <Filter>Engine\manager</Filter>
-    </ClCompile>
-    <ClCompile Include="manager\InputManager.cpp">
       <Filter>Engine\manager</Filter>
     </ClCompile>
     <ClCompile Include="manager\TextureManager.cpp">
@@ -232,6 +232,18 @@
     <ClCompile Include="engine\directX\DirectXCommon.cpp">
       <Filter>Engine\directXCommon</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Input\GamePad.cpp">
+      <Filter>Engine\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Input\Keyboard.cpp">
+      <Filter>Engine\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\IScene.cpp">
+      <Filter>Application\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Input\InputManager.cpp">
+      <Filter>Engine\Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -265,9 +277,6 @@
       <Filter>Engine\manager</Filter>
     </ClInclude>
     <ClInclude Include="manager\DrawManager.h">
-      <Filter>Engine\manager</Filter>
-    </ClInclude>
-    <ClInclude Include="manager\InputManager.h">
       <Filter>Engine\manager</Filter>
     </ClInclude>
     <ClInclude Include="manager\TextureManager.h">
@@ -440,6 +449,15 @@
     </ClInclude>
     <ClInclude Include="engine\directX\DirectXCommon.h">
       <Filter>Engine\directXCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Input\Keyboard.h">
+      <Filter>Engine\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Input\GamePad.h">
+      <Filter>Engine\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Input\InputManager.h">
+      <Filter>Engine\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

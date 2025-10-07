@@ -3,7 +3,7 @@
 #include "../math/Vector3.h"
 #include "../math/Matrix4x4.h"
 #include "../function/Math.h"
-#include "../manager/InputManager.h"
+#include "../engine/Input/InputManager.h"
 #include "../camera/Camera.h"
 
 /*デバッグカメラ*/
@@ -29,7 +29,7 @@ public: //メンバ関数
     /// <summary>
     /// 初期化
     /// </summary>
-    void Initialize(InputManager* input);
+    void Initialize(InputManager* input, int windowWidth, int windowHeight);
 
     /// <summary>
     /// 更新

@@ -17,6 +17,11 @@ protected:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
     static uint32_t index_;
+
+    // 読み込んだテクスチャの元サイズ
+    uint32_t width_ = 0;
+    uint32_t height_ = 0;
+
 public:
     //デストラクタ
     ~Texture() = default;
@@ -27,6 +32,10 @@ public:
     //ゲッター
 
     D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandleGPU() { return textureSrvHandleGPU_; }
+
+    // サイズ取得
+    uint32_t GetWidth() const { return width_; }
+    uint32_t GetHeight() const { return height_; }
 
     static uint32_t GetStaticSRVIndex() { return index_; }
 

@@ -138,7 +138,7 @@ void DebugUI::DebugMaterialBy3D(Material* materialData) {
 
 // Material
 void DebugUI::DebugMaterialBy2D(Material* materialData) {
-    if (ImGui::TreeNodeEx("material")) {
+    if (ImGui::CollapsingHeader("material")) {
         ImGui::ColorEdit4("spriteColor", &materialData->color.x);
     }
 }

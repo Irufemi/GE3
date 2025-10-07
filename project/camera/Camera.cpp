@@ -19,6 +19,12 @@ Camera::~Camera() {}
 void Camera::Initialize(int window_width,int window_height) {
     width_ = static_cast<float>(window_width);
     height_ = static_cast<float>(window_height);
+
+    // ウィンドウサイズに基づいてアスペクト比と正射影境界を更新
+    aspectRatio_ = (height_ != 0.0f) ? (width_ / height_) : 1.0f;
+    right_ = width_;
+    bottom_ = height_;
+
     MakeWorldMatrix();
     MakeViewMatrix();
     UpdatePerspectiveFovMatrix();
