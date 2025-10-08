@@ -76,6 +76,9 @@
     <Filter Include="Engine\Input">
       <UniqueIdentifier>{95621e64-dbc5-4cf8-b02e-7026fe8561c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\WinApp">
+      <UniqueIdentifier>{1aa52f0c-5ed3-4be4-ac6f-3283914f5a42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -211,9 +214,6 @@
     <ClCompile Include="function\UploadTextureData.cpp">
       <Filter>Engine\function</Filter>
     </ClCompile>
-    <ClCompile Include="function\WindowProc.cpp">
-      <Filter>Engine\function</Filter>
-    </ClCompile>
     <ClCompile Include="math\Vector3 .cpp">
       <Filter>math</Filter>
     </ClCompile>
@@ -243,6 +243,9 @@
     </ClCompile>
     <ClCompile Include="engine\Input\InputManager.cpp">
       <Filter>Engine\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\WinApp\WinApp.cpp">
+      <Filter>Engine\WinApp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -458,6 +461,9 @@
     </ClInclude>
     <ClInclude Include="engine\Input\InputManager.h">
       <Filter>Engine\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\WinApp\WinApp.h">
+      <Filter>Engine\WinApp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

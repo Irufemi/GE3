@@ -28,7 +28,7 @@ public:
 
 
     // 1つ目の塊でやってること
-    void First(const std::wstring& title, int32_t w, int32_t h);
+    void First(HWND hwnd, int32_t w, int32_t h);
 
     // 2つ目の塊でやってること
     void Second();

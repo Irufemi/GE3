@@ -8,7 +8,6 @@
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
-#include <cassert>
 
 /*CrashHandler*/
 
@@ -22,24 +21,10 @@
 #include <dxcapi.h>
 #include "../math/Vector4.h"
 
-/*開発のUIを出そう*/
-
-#include "../externals/imgui/imgui.h"
-#include "../externals/imgui/imgui_impl_dx12.h"
-#include "../externals/imgui/imgui_impl_win32.h"
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 /*テクスチャを貼ろう*/
 
 #include "../externals/DirectXTex/DirectXTex.h"
 
-/*テクスチャを正しく配置しよう*/
-
-///事前準備
-
-#include "../externals/DirectXTex/d3dx12.h"
-
-#include <vector>
 
 /*objファイルを読んでみよう*/
 
@@ -53,12 +38,6 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 /*サウンド再生*/
 #include "../math/SoundData.h"
-
-/*ウィンドウを作ろう*/
-
-///ウィンドウプロシージャ
-
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 /*ログを出そう*/
 

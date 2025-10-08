@@ -191,7 +191,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="function\SoundPlayWave.cpp" />
     <ClCompile Include="function\SoundUnload.cpp" />
     <ClCompile Include="function\UploadTextureData.cpp" />
-    <ClCompile Include="function\WindowProc.cpp" />
     <ClCompile Include="engine\Input\GamePad.cpp" />
     <ClCompile Include="engine\Input\Keyboard.cpp" />
     <ClCompile Include="main.cpp">
@@ -212,6 +211,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="scene\title\TitleScene.cpp" />
     <ClCompile Include="source\Sound.cpp" />
     <ClCompile Include="source\Texture.cpp" />
+    <ClCompile Include="engine\WinApp\WinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2D\Sprite.h" />
@@ -285,6 +285,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="source\D3D12ResourceUtil.h" />
     <ClInclude Include="source\Sound.h" />
     <ClInclude Include="source\Texture.h" />
+    <ClInclude Include="engine\WinApp\WinApp.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

@@ -1,4 +1,5 @@
 #include "Function.h"
+#include "../externals/DirectXTex/d3dx12.h"
 
 /*テクスチャを貼ろう*/
 

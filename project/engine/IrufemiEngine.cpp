@@ -15,6 +15,7 @@
 #include "../scene/inGame/GameScene.h"
 #include "../scene/result/ResultScene.h"
 #include "../scene/SceneName.h"
+#include "../externals/imgui/imgui.h"
 
 #pragma comment(lib,"Dbghelp.lib")
 #pragma comment(lib,"d3d12.lib")
@@ -27,45 +28,43 @@ IrufemiEngine::~IrufemiEngine() { Finalize(); }
 // 初期化
 void IrufemiEngine::Initialize(const std::wstring& title, const int32_t& clientWidth, const int32_t& clientHeight) {
 
-    /*テクスチャを貼ろう*/
-
-    ///COMの初期化
-
-    HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
-    assert(SUCCEEDED(hr));
-
-    // AudioManagerの生成・Media Foundationの初期化
-    audioManager_ = std::make_unique<AudioManager>();
-    audioManager_->StartUp();
-
     /*CrashHandler*/
     SetUnhandledExceptionFilter(ExportDump);
+
+    // WinApp をエンジン内で生成・初期化（COM 初期化もここで実施される）
+    winApp_ = std::make_unique<WinApp>();
+    if (!winApp_->Initialize(GetModuleHandle(nullptr), clientWidth, clientHeight, title.c_str())) {
+        assert(false && "WinApp::Initialize failed");
+        return;
+    }
 
     // ログを出せるようにする
     log_ = std::make_unique<Log>();
     log_->Initialize();
 
-    dxCommon_ = std::make_unique<DirectXCommon>();
-    dxCommon_->SetLog(log_.get());
-
-    dxCommon_->First(title, clientWidth, clientHeight);
-
-
-    inputManager_ = std::make_unique<InputManager>();
-    inputManager_->Initialize();
-
+    // AudioManagerの生成・Media Foundationの初期化
+    audioManager_ = std::make_unique<AudioManager>();
+    audioManager_->StartUp();
     // AudioManagerの初期化
     audioManager_->Initialize();
-
     // "resources"フォルダから音声ファイルをすべてロード
     audioManager_->LoadAllSoundsFromFolder("resources/");
 
+    // DirectX 基盤
+    dxCommon_ = std::make_unique<DirectXCommon>();
+    dxCommon_->SetLog(log_.get());
+    dxCommon_->First(winApp_->GetHwnd(), winApp_->GetClientWidth(), winApp_->GetClientHeight());
     dxCommon_->Second();
 
+    // 入力
+    inputManager_ = std::make_unique<InputManager>();
+    inputManager_->Initialize();
+
+    // UI
     ui = std::make_unique <DebugUI>();
     ui->Initialize(GetCommandList(), GetDevice(), GetHwnd(), GetSwapChainDesc(), GetRtvDesc(), GetSrvDescriptorHeap());
 
-
+    // 描画
     drawManager = std::make_unique< DrawManager>();
     drawManager->Initialize(
         GetCommandList(),
@@ -78,10 +77,11 @@ void IrufemiEngine::Initialize(const std::wstring& title, const int32_t& clientW
         GetRootSignature()
     );
 
+    // テクスチャ
+
     textureManager = std::make_unique <TextureManager>();
     textureManager->Initialize(GetDevice(), GetSrvDescriptorHeap(), GetCommandList(), GetCommandQueue());
     textureManager->LoadAllFromFolder("resources/");
-
     ui->SetTextureManager(textureManager.get());
 
 }
@@ -108,10 +108,13 @@ void IrufemiEngine::Finalize() {
         ui.reset();
     }
 
-    dxCommon_->Finalize();
+    if (dxCommon_) {
+        dxCommon_->Finalize(); dxCommon_.reset();
+    }
 
-    // COM解放
-    CoUninitialize();
+    if (winApp_) {
+        winApp_.reset();
+    }
 }
 
 namespace {
@@ -126,7 +129,7 @@ namespace {
 void IrufemiEngine::Execute() {
 
     // SceneManager 構築・登録
-    
+
     sceneManager_ = std::make_unique<SceneManager>(this);     // ★エンジンを渡す
     g_SceneManager = sceneManager_.get();
 
@@ -139,41 +142,35 @@ void IrufemiEngine::Execute() {
     // 初期シーン
     sceneManager_->ChangeTo(SceneName::inGame);
 
-    MSG msg{};
-    while (msg.message != WM_QUIT) {
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        } else {
-            // 入力
-            inputManager_->Update();
-            // ImGui
-            ui->FrameStart();
+    while (winApp_->ProcessMessages()) {
+        // 入力
+        inputManager_->Update();
+        // ImGui
+        ui->FrameStart();
 
 #ifdef _DEBUG
 
-            // 　シーン選択UI（Requestで要求を出す）
-            ImGui::Begin("Scene Selector");
-            int idx = static_cast<int>(g_SceneManager->GetCurrent());
-            if (ImGui::Combo("Scene", &idx, kSceneLabels.data(), static_cast<int>(kSceneLabels.size()))) {
-                g_SceneManager->Request(static_cast<SceneName>(idx)); // or ChangeTo(...)
-            }
-            ImGui::End();
+        // 　シーン選択UI（Requestで要求を出す）
+        ImGui::Begin("Scene Selector");
+        int idx = static_cast<int>(g_SceneManager->GetCurrent());
+        if (ImGui::Combo("Scene", &idx, kSceneLabels.data(), static_cast<int>(kSceneLabels.size()))) {
+            g_SceneManager->Request(static_cast<SceneName>(idx)); // or ChangeTo(...)
+        }
+        ImGui::End();
 
 #endif // _DEBUG
 
-            // 更新
-            sceneManager_->Update();
+        // 更新
+        sceneManager_->Update();
 
-            // フレーム途中処理
-            ProcessFrame();
+        // フレーム途中処理
+        ProcessFrame();
 
-            // 描画
-            sceneManager_->Draw();
+        // 描画
+        sceneManager_->Draw();
 
-            // 終了処理
-            EndFrame();
-        }
+        // 終了処理
+        EndFrame();
     }
 }
 

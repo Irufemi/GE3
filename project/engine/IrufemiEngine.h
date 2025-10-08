@@ -16,10 +16,7 @@
 #include <dxgi1_6.h>
 #include "directX/DirectXCommon.h"
 #include "../scene/SceneManager.h"
-
-// 前方宣言
-class SceneManager;          // ★追加（Engine内に持つ）
-class IScene;                // 既存で利用
+#include "WinApp/WinApp.h"
 
 class IrufemiEngine {
 
@@ -39,7 +36,10 @@ private: // メンバ変数
     // ログ
     std::unique_ptr<Log> log_ = nullptr;
 
-    // ★DirectX基盤は DirectXCommon に集約
+    // WinApp
+    std::unique_ptr<WinApp> winApp_ = nullptr;
+
+    // DirectX基盤
     std::unique_ptr<DirectXCommon> dxCommon_ = nullptr;
 
     // --- Manager ---
