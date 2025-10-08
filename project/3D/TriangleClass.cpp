@@ -1,6 +1,7 @@
 #include "TriangleClass.h"
 #include "../function/Math.h"
 #include "../function/Function.h"
+#include "../externals/imgui/imgui.h"
 
 #include <algorithm>
 

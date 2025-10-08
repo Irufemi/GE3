@@ -47,58 +47,15 @@ void DirectXCommon::Finalize() {
 #endif
 
     if (hwnd_) {
-        CloseWindow(hwnd_);
         hwnd_ = nullptr;
     }
 }
 
-void DirectXCommon::First(const std::wstring& title, int32_t w, int32_t h) {
+void DirectXCommon::First(HWND hwnd, int32_t w, int32_t h) {
 
+    hwnd_ = hwnd;
     clientWidth_ = w;
     clientHeight_ = h;
-
-    /*ウィンドウを作ろう*/
-
-    ///ウィンドウクラスを登録する
-
-    WNDCLASS wc{};
-    //ウィンドウプロシージャ
-    wc.lpfnWndProc = WindowProc;
-    //ウィンドウクラス名(なんでもいい)
-    wc.lpszClassName = L"CG3WindowClass";
-    //インスタンスハンドル
-    wc.hInstance = GetModuleHandle(nullptr);
-    //カーソル
-    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-
-    //ウィンドウクラスを登録する
-    RegisterClass(&wc);
-
-    ///ウィンドウサイズを決める
-
-
-    //ウィンドウサイズを表す構造体にクライアント領域を入れる
-    RECT wrc = { 0,0,clientWidth_ ,clientHeight_ };
-
-    //クライアント領域をもとに実際のサイズにwrcを変更してもらう
-    AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-    ///ウィンドウを生成して表示
-
-    //ウィンドウの生成
-    hwnd_ = CreateWindow(
-        wc.lpszClassName,		//利用するクラス名
-        title.c_str(),			        //タイトルバーの文字(何でも良い)
-        WS_OVERLAPPEDWINDOW,	//よく見るウィンドウスタイル
-        CW_USEDEFAULT,			//表示X座標(windowsに任せる)
-        CW_USEDEFAULT,			//表示Y座標(windowsに任せる)
-        wrc.right - wrc.left,	//ウィンドウ横幅
-        wrc.bottom - wrc.top,	//ウィンドウ縦幅
-        nullptr,				//親ウィンドウハンドル
-        nullptr,				//メニューハンドル
-        wc.hInstance,			//インスタンスハンドル
-        nullptr					//オプション
-    );
 
     /*エラー放置ダメ、絶対*/
 
@@ -113,13 +70,6 @@ void DirectXCommon::First(const std::wstring& title, int32_t w, int32_t h) {
         debugController_->SetEnableGPUBasedValidation(TRUE);
     }
 #endif
-
-    /*ウィンドウを作ろう*/
-
-    ///ウィンドウを生成して表示
-
-    //ウィンドウを表示する
-    ShowWindow(hwnd_, SW_SHOW);
 
     /*DirectX12を初期化しよう*/
 

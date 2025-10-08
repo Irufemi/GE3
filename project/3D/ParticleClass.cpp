@@ -1,6 +1,7 @@
 #include "ParticleClass.h"
 
 #include "Math.h"
+#include "../externals/imgui/imgui.h"
 
 #include <algorithm>
 

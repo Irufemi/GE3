@@ -3,6 +3,7 @@
 #include "../SceneManager.h"
 #include "../SceneName.h"
 #include "../../engine/IrufemiEngine.h"
+#include "../../externals/imgui/imgui.h"
 
 #include <algorithm>
 

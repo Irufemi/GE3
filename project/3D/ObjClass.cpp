@@ -5,6 +5,7 @@
 #include "../function/Math.h"
 #include "../manager/DrawManager.h"
 #include "../manager/TextureManager.h"
+#include "../externals/imgui/imgui.h"
 
 void ObjClass::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, Camera* camera, ID3D12DescriptorHeap* srvDescriptorHeap, const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList, DebugUI* ui, TextureManager* textureManager, const std::string& filename) {
 
